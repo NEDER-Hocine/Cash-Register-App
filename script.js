@@ -1,88 +1,89 @@
-const numberInput = document.getElementById("number");
-const convertButton = document.getElementById("convert-btn");
-const convertResult = document.getElementById("output");
-const resultBox = document.querySelector("#result div");
+let price = 19.5;
+let cid = [
+  ['PENNY', 0],
+  ['NICKEL', 0],
+  ['DIME', 0],
+  ['QUARTER', 0.5],
+  ['ONE', 0],
+  ['FIVE', 0],
+  ['TEN', 0],
+  ['TWENTY', 0],
+  ['ONE HUNDRED', 0]
+];
+let cash;
+let currencies = [100, 20, 10, 5, 1, 0.25, 0.1, 0.05, 0.01];
 
-const symbols = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
+const cashInput = document.getElementById("cash");
+const purchaseBtn = document.getElementById("purchase-btn");
+const totalPrice = document.getElementById("price");
+const cashInDrawer = document.getElementById("cid");
+const changeDue = document.getElementById("change-due");
 
-function convert() {
-  resultBox.classList.remove("hidden");
-  convertResult.innerText = "";
-  if (!numberInput.value) {
-    resultBox.classList.add("error");
-    convertResult.innerText = "Please enter a valid number";
-  } else if (numberInput.value < 1) {
-    resultBox.classList.add("error");
-    convertResult.innerText = "Please enter a number greater than or equal to 1";
-  } else if (numberInput.value > 3999) {
-    resultBox.classList.add("error");
-    convertResult.innerText = "Please enter a number less than or equal to 3999";
-  } else {
-    resultBox.classList.remove("error");
-    resultOutput(symbolsNumber(numberInput.value));
+const updateRegister = () => {
+  totalPrice.textContent = `$${price}`;
+  cashInDrawer.innerHTML = `Change in drawer:<br><br>`
+  cid.forEach((el) => {
+    cashInDrawer.innerHTML += `${el[0]}: $${el[1]}<br>`
+  });
+}
+
+updateRegister();
+
+const returnChange = () => {
+
+  changeDue.innerHTML = "";
+  cash = Number(cashInput.value);
+
+  if (cash < price) {
+    alert("Customer does not have enough money to purchase the item");
+    return;
   }
-}
 
-function symbolsNumber(number) {
-  const symbolsArray = [];
+  if (cash === price) {
+    changeDue.textContent = "No change due - customer paid with exact cash";
+    return; 
+  }
 
-  const m = Math.floor(number / 1000);
-  number -= m * 1000;
-  symbolsArray.push(m);
-  const cm = Math.floor(number / 900);
-  number -= cm * 900;
-  symbolsArray.push(cm);
-  const d = Math.floor(number / 500);
-  number -= d * 500;
-  symbolsArray.push(d);
-  const cd = Math.floor(number / 400);
-  number -= cd * 400;
-  symbolsArray.push(cd);
-  const c = Math.floor(number / 100);
-  number -= c * 100;
-  symbolsArray.push(c);
-  const xc = Math.floor(number / 90);
-  number -= xc * 90;
-  symbolsArray.push(xc);
-  const l = Math.floor(number / 50);
-  number -= l * 50;
-  symbolsArray.push(l);
-  const xl = Math.floor(number / 40);
-  number -= xl * 40;
-  symbolsArray.push(xl);
-  const x = Math.floor(number / 10);
-  number -= x * 10;
-  symbolsArray.push(x);
-  const ix = Math.floor(number / 9);
-  number -= ix * 9;
-  symbolsArray.push(ix);
-  const v = Math.floor(number / 5);
-  number -= v * 5;
-  symbolsArray.push(v);
-  const iv = Math.floor(number / 4);
-  number -= iv * 4;
-  symbolsArray.push(iv);
-  const i = Math.floor(number / 1);
-  number -= i * 1;
-  symbolsArray.push(i);
+  let change = cash - price;
+  let amountFromDrawer = [];
+  const reversedCid = [...cid].reverse();
+  
+  currencies.forEach((currency, index) => {
 
-  return symbolsArray;
-}
+    let coins = 0;
 
-function resultOutput(arr) {
-  var symbolsIndex = 0;
-  arr.forEach((symboL) => {
-    for (var i = 0; i < symboL; i++) {
-      convertResult.innerText += symbols[symbolsIndex];
+    while (change >= currency && (cid[cid.length - 1 - index][1] - currency).toFixed(2) >= 0) {
+
+      change = (change - currency).toFixed(2);
+      cid[cid.length - 1 - index][1] = (cid[cid.length - 1 - index][1] - currency).toFixed(2);
+      coins ++;
+
+      if (coins === 1) {
+        amountFromDrawer.push([reversedCid[index][0], 0]);
+      }
+
     }
-    symbolsIndex ++;
+    if (coins > 0) {
+    amountFromDrawer[amountFromDrawer.length - 1][1] = coins * currency;
+    
+    }
+  });
+
+  updateRegister();
+
+  if (parseFloat(change) !== 0) {
+    changeDue.textContent = "Status: INSUFFICIENT_FUNDS";
+    return;
+  }
+
+  if (cid.every((el) => parseFloat(el[1]) === 0) === true) {
+    changeDue.innerHTML = "Status: CLOSED<br><br>";
+  } else {
+  changeDue.innerHTML = "Status: OPEN<br><br>";
+  }
+  amountFromDrawer.forEach(amount => {
+    changeDue.innerHTML += `${amount[0]}: $${amount[1]}<br>`;
   })
 }
 
-convertButton.addEventListener("click", convert);
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    convert();
-  }
-});
+purchaseBtn.addEventListener("click", returnChange);

@@ -3,25 +3,28 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roman Numeral Converter</title>
+    <title>Cash Register</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <main>
-      <h1>Roman Numeral Converter</h1>
-      <section id="converter">
-        <div>
-          <label for="number">Enter a Number:</label>
-          <input id="number" type="number">
-          <button id="convert-btn">Convert</button>
+    <h1>Cash Register</h1>
+    <label for="cash">Enter cash from customer:</label>
+    <input id="cash" type="number" min="0">
+    <button id="purchase-btn">Purchase</button>
+    <div id="register-and-change-due">
+      <div id="register">
+        <div id="price-screen">total: <span id="price"></span></div>
+        <div id="screen-handel"></div>
+        <div id="register-body">
+          <div id="keyPad"></div>
+          <div id="cid"></div>
         </div>
-      </section>
-      <section id="result">
-        <div class="result-div hidden">
-          <p id="output"></p>
+        <div id="register-drawer">
+          <div id="drawer-handel"></div>
         </div>
-      </section>
-    </main>
+      </div>
+      <div id="change-due"></div>
+    </div>
+    <script src="script.js"></script>
   </body>
-  <script src="script.js"></script>
 </html>
